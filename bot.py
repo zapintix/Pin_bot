@@ -1,6 +1,7 @@
 import os
-
+from pybotx.client.exceptions.callbacks import CallbackNotReceivedError
 from dotenv import load_dotenv
+import logging
 from pybotx import (
     Bot,
     BotAccountWithSecret,
@@ -10,7 +11,21 @@ from pybotx import (
 
 load_dotenv()
 
+logger = logging.getLogger(__name__)
 collector = HandlerCollector()
+
+async def internal_error_handler(
+    message: IncomingMessage, bot: Bot, exc: Exception
+) -> None:
+    if isinstance(exc, CallbackNotReceivedError):
+        logger.warning("Callback not received (timeout), ignoring: %s", exc)
+        return
+    logger.exception("Internal bot error:")
+    try:
+        await bot.answer_message("Произошла внутренняя ошибка. Попробуйте позже.")
+    except Exception:
+        logger.exception("Failed to send error message to user")
+
 
 bot = Bot(
     collectors=[collector],
@@ -19,8 +34,9 @@ bot = Bot(
             id=os.environ["EXPRESS_BOT_ID"],
             cts_url=os.environ["EXPRESS_HOST"],
             secret_key=os.environ["EXPRESS_SECRET_KEY"],
-        )
+        ),
     ],
+    exception_handlers={Exception: internal_error_handler},
 )
 
 waiting_for_pin: dict[str, str] = {}
