@@ -24,12 +24,12 @@ async def pin_command(
     bot: Bot,
 ) -> None:
     print("🔥🔥🔥 PIN HANDLER CALLED")
-
+    print("message",message)
     chat_id = str(message.chat.id)
     print("CHAT_ID",chat_id)
-    user_id = str(message.sender.id)
-    print("USER_ID",user_id)
-    waiting_for_pin[chat_id] = user_id
+    user_huid = str(message.sender.huid)
+    print("USER_ID",user_huid)
+    waiting_for_pin[chat_id] = user_huid
     print("waiting_for_pin", waiting_for_pin)
     await bot.answer_message(
         "📌 Отправьте сообщение, которое нужно закрепить."
