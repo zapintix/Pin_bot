@@ -34,14 +34,25 @@ async def pin_command(
     message: IncomingMessage,
     bot: Bot,
 ) -> None:
+    print("🔥🔥🔥")
+    print("message:", message)
+    print("chat_id:", message.chat.id)
+    print("user_id:", message.sender.id)
+    print("sync_id:", message.sync_id)
+    print("argument:", message.argument)
+
     chat_id = str(message.chat.id)
     user_id = str(message.sender.id)
 
     waiting_for_pin[chat_id] = user_id
 
+    print("📌 WAITING FOR MESSAGE:", waiting_for_pin)
+
     await bot.answer_message(
         "📌 Отправьте сообщение, которое нужно закрепить."
     )
+
+    print("✅ PIN RESPONSE SENT")
 
 
 @collector.command(

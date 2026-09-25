@@ -28,17 +28,22 @@ app = FastAPI(lifespan=lifespan)
 
 @app.post("/command")
 async def command_handler(request: Request):
+    data = await request.json()
+
+    print("🔥 COMMAND RECEIVED")
+    print("DATA:", data)
+
     bot.async_execute_raw_bot_command(
-        await request.json(),
+        data,
         request_headers=request.headers,
     )
-    print(request)
+
+    print("➡️ SENT TO PYBOTX")
 
     return JSONResponse(
         build_command_accepted_response(),
         status_code=HTTPStatus.ACCEPTED,
     )
-
 
 @app.get("/status")
 async def status_handler(request: Request):
