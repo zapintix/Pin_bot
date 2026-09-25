@@ -10,4 +10,6 @@ RUN uv sync --frozen --no-dev
 
 COPY . .
 
+ENV PYTHONUNBUFFERED=1
+
 CMD ["uv", "run", "python", "bot.py"]
