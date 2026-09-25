@@ -60,3 +60,7 @@ async def callback_handler(request: Request):
         build_command_accepted_response(),
         status_code=HTTPStatus.ACCEPTED,
     )
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}
