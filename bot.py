@@ -62,9 +62,9 @@ async def message_handler(
     bot: Bot,
 ) -> None:
     chat_id = str(message.chat.id)
-    user_id = str(message.sender.id)
+    user_huid = str(message.sender.huid)
 
-    if waiting_for_pin.get(chat_id) != user_id:
+    if waiting_for_pin.get(chat_id) != user_huid:
         return
 
     waiting_for_pin.pop(chat_id, None)
