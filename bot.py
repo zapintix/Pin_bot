@@ -25,7 +25,7 @@ async def pin_command(
 ) -> None:
     print("🔥🔥🔥 PIN HANDLER CALLED")
     print("message",message)
-    chat_id = str(message.chat.id)
+    chat_id = os.environ["CHAT_ID"]
     print("CHAT_ID",chat_id)
     user_huid = str(message.sender.huid)
     print("USER_ID",user_huid)
@@ -48,7 +48,7 @@ async def unpin_command(
 
     await bot.unpin_message(
         bot_id=message.bot.id,
-        chat_id=message.chat.id,
+        chat_id=os.environ["CHAT_ID"],
     )
 
     await bot.answer_message(
@@ -71,7 +71,7 @@ async def message_handler(
 
     await bot.pin_message(
         bot_id=message.bot.id,
-        chat_id=message.chat.id,
+        chat_id=os.environ["CHAT_ID"],
         sync_id=message.sync_id,
     )
 
