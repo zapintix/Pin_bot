@@ -27,25 +27,6 @@ bot = Bot(
 
 waiting_for_pin: dict[str, str] = {}
 
-
-@collector.command(
-    "/pin",
-    description="Закрепить сообщение",
-)
-async def pin_command(
-    message: IncomingMessage,
-    bot: Bot,
-) -> None:
-    chat_id = str(message.chat.id)
-    user_id = str(message.sender.id)
-
-    waiting_for_pin[chat_id] = user_id
-
-    await bot.answer_message(
-        "📌 Введите сообщение, которое нужно закрепить."
-    )
-
-
 @collector.command(
     "/pin",
     description="Закрепить сообщение",
