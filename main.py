@@ -32,6 +32,7 @@ async def command_handler(request: Request):
         await request.json(),
         request_headers=request.headers,
     )
+    print(request)
 
     return JSONResponse(
         build_command_accepted_response(),
