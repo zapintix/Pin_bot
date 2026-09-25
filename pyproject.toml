@@ -1,0 +1,10 @@
+[project]
+name = "express-pin-bot"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pybotx>=0.77.0",
+    "python-dotenv>=1.2.3",
+]

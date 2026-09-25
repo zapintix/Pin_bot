@@ -1,0 +1,13 @@
+services:
+  express-bot:
+    build: .
+    container_name: express_pin_bot
+    ports:
+      - "${PORT_OUT:-8113}:3000"
+    env_file:
+      - .env
+    restart: always
+    volumes:
+      - pin_data:/app/data
+volumes:
+  pin_data:
