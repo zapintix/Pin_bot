@@ -61,7 +61,7 @@ async def message_handler(
     message: IncomingMessage,
     bot: Bot,
 ) -> None:
-    chat_id = str(message.chat.id)
+    chat_id = os.environ["CHAT_ID"]
     user_huid = str(message.sender.huid)
 
     if waiting_for_pin.get(chat_id) != user_huid:
