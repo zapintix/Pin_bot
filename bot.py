@@ -1,7 +1,6 @@
 import os
-from pybotx.client.exceptions.callbacks import CallbackNotReceivedError
+
 from dotenv import load_dotenv
-import logging
 from pybotx import (
     Bot,
     BotAccountWithSecret,
@@ -11,33 +10,7 @@ from pybotx import (
 
 load_dotenv()
 
-logger = logging.getLogger(__name__)
 collector = HandlerCollector()
-
-async def internal_error_handler(
-    message: IncomingMessage, bot: Bot, exc: Exception
-) -> None:
-    if isinstance(exc, CallbackNotReceivedError):
-        logger.warning("Callback not received (timeout), ignoring: %s", exc)
-        return
-    logger.exception("Internal bot error:")
-    try:
-        await bot.answer_message("Произошла внутренняя ошибка. Попробуйте позже.")
-    except Exception:
-        logger.exception("Failed to send error message to user")
-
-
-bot = Bot(
-    collectors=[collector],
-    bot_accounts=[
-        BotAccountWithSecret(
-            id=os.environ["EXPRESS_BOT_ID"],
-            cts_url=os.environ["EXPRESS_HOST"],
-            secret_key=os.environ["EXPRESS_SECRET_KEY"],
-        ),
-    ],
-    exception_handlers={Exception: internal_error_handler},
-)
 
 waiting_for_pin: dict[str, str] = {}
 
@@ -50,25 +23,16 @@ async def pin_command(
     message: IncomingMessage,
     bot: Bot,
 ) -> None:
-    print("🔥🔥🔥")
-    print("message:", message)
-    print("chat_id:", message.chat.id)
-    print("user_id:", message.sender.id)
-    print("sync_id:", message.sync_id)
-    print("argument:", message.argument)
+    print("🔥🔥🔥 PIN HANDLER CALLED")
 
     chat_id = str(message.chat.id)
     user_id = str(message.sender.id)
 
     waiting_for_pin[chat_id] = user_id
 
-    print("📌 WAITING FOR MESSAGE:", waiting_for_pin)
-
     await bot.answer_message(
         "📌 Отправьте сообщение, которое нужно закрепить."
     )
-
-    print("✅ PIN RESPONSE SENT")
 
 
 @collector.command(
@@ -113,3 +77,20 @@ async def message_handler(
     await bot.answer_message(
         "📌 Сообщение закреплено!"
     )
+
+
+print(
+    "REGISTERED COMMANDS:",
+    collector._user_commands_handlers.keys(),
+)
+
+bot = Bot(
+    collectors=[collector],
+    bot_accounts=[
+        BotAccountWithSecret(
+            id=os.environ["EXPRESS_BOT_ID"],
+            cts_url=os.environ["EXPRESS_HOST"],
+            secret_key=os.environ["EXPRESS_SECRET_KEY"],
+        )
+    ],
+)
