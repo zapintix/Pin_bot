@@ -47,24 +47,22 @@ async def pin_command(
 
 
 @collector.command(
-    "/unpin",
-    description="Открепить сообщение",
+    "/pin",
+    description="Закрепить сообщение",
 )
-async def unpin_command(
+async def pin_command(
     message: IncomingMessage,
     bot: Bot,
 ) -> None:
+    print("🔥 /pin ПОЛУЧЕН")
+
     chat_id = str(message.chat.id)
+    user_id = str(message.sender.id)
 
-    waiting_for_pin.pop(chat_id, None)
-
-    await bot.unpin_message(
-        bot_id=message.bot.id,
-        chat_id=message.chat.id,
-    )
+    waiting_for_pin[chat_id] = user_id
 
     await bot.answer_message(
-        "📌 Сообщение откреплено."
+        "📌 Введите сообщение, которое нужно закрепить."
     )
 
 
@@ -73,6 +71,8 @@ async def message_handler(
     message: IncomingMessage,
     bot: Bot,
 ) -> None:
+    print("🔥 СООБЩЕНИЕ ПОЛУЧЕНО:", message.body)
+
     chat_id = str(message.chat.id)
     user_id = str(message.sender.id)
 
@@ -90,9 +90,8 @@ async def message_handler(
     )
 
     await bot.answer_message(
-        "📌 Сообщение закреплено!"
+        "📌 Сообщение закреплено!",
     )
-
 
 async def main() -> None:
     await bot.startup()
