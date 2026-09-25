@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from http import HTTPStatus
 
 from fastapi import FastAPI, Request
@@ -6,17 +7,23 @@ from pybotx import build_command_accepted_response
 
 from bot import bot
 
-app = FastAPI()
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    print("🤖 Bot starting...")
 
-@app.on_event("startup")
-async def startup():
     await bot.startup()
 
+    print("🤖 Bot started")
 
-@app.on_event("shutdown")
-async def shutdown():
-    await bot.shutdown()
+    try:
+        yield
+    finally:
+        print("🛑 Bot stopping...")
+        await bot.shutdown()
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.post("/command")
