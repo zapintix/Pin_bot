@@ -71,35 +71,31 @@ async def message_handler(
     message: IncomingMessage,
     bot: Bot,
 ) -> None:
-    chat_id = os.environ["CHAT_ID"]
+    target_chat_id = os.environ["CHAT_ID"]
+    message_chat_id = str(message.chat.id)
     user_huid = str(message.sender.huid)
 
-    print("MESSAGE - chat_id:", chat_id)
+    print("MESSAGE - chat_id:", message_chat_id)
     print("MESSAGE - user_huid:", user_huid)
 
-    waiting = waiting_for_pin.get(chat_id)
+    if message_chat_id != target_chat_id:
+        return
+
+    waiting = waiting_for_pin.get(target_chat_id)
 
     if not waiting:
         return
 
     if waiting["user_huid"] != user_huid:
-        print("ERROR WITH user_huid")
         return
 
     reply_chat_id = UUID(waiting["reply_chat_id"])
 
-    waiting_for_pin.pop(chat_id, None)
-
-    print(
-        "DATA FOR PIN:",
-        message.bot.id,
-        UUID(chat_id),
-        message.sync_id,
-    )
+    waiting_for_pin.pop(target_chat_id, None)
 
     await bot.pin_message(
         bot_id=message.bot.id,
-        chat_id=UUID(chat_id),
+        chat_id=UUID(target_chat_id),
         sync_id=message.sync_id,
     )
 
