@@ -73,6 +73,7 @@ async def message_handler(
 
     waiting_for_pin.pop(chat_id, None)
 
+    print("DATA FOR PIN:", message.bot.id, UUID(chat_id), message.sync_id)
     await bot.pin_message(
         bot_id=message.bot.id,
         chat_id=UUID(chat_id),
