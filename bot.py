@@ -13,7 +13,7 @@ load_dotenv()
 
 collector = HandlerCollector()
 
-waiting_for_pin: dict[str, str] = {}
+waiting_for_pin: dict[str, dict[str, str]] = {}
 
 
 @collector.command(
@@ -25,15 +25,22 @@ async def pin_command(
     bot: Bot,
 ) -> None:
     print("🔥🔥🔥 PIN HANDLER CALLED")
-    print("message",message)
+
     chat_id = os.environ["CHAT_ID"]
-    print("CHAT_ID",chat_id)
     user_huid = str(message.sender.huid)
-    print("USER_ID",user_huid)
-    waiting_for_pin[chat_id] = user_huid
+
+    print("CHAT_ID", chat_id)
+    print("USER_ID", user_huid)
+
+    waiting_for_pin[chat_id] = {
+        "user_huid": user_huid,
+        "reply_chat_id": str(message.chat.id),
+    }
+
     print("waiting_for_pin", waiting_for_pin)
+
     await bot.answer_message(
-        "📌 Отправьте сообщение, которое нужно закрепить."
+        "📌 Отправьте в чат сообщение, которое нужно закрепить."
     )
 
 
@@ -45,11 +52,13 @@ async def unpin_command(
     message: IncomingMessage,
     bot: Bot,
 ) -> None:
-    waiting_for_pin.pop(str(message.chat.id), None)
+    chat_id = os.environ["CHAT_ID"]
+
+    waiting_for_pin.pop(chat_id, None)
 
     await bot.unpin_message(
         bot_id=message.bot.id,
-        chat_id=os.environ["CHAT_ID"],
+        chat_id=UUID(chat_id),
     )
 
     await bot.answer_message(
@@ -64,24 +73,40 @@ async def message_handler(
 ) -> None:
     chat_id = os.environ["CHAT_ID"]
     user_huid = str(message.sender.huid)
-    print("MESSAGE - chat_id: ", chat_id)
-    print("MESSAGE - user_huid: ", user_huid)
 
-    if waiting_for_pin.get(chat_id) != user_huid:
+    print("MESSAGE - chat_id:", chat_id)
+    print("MESSAGE - user_huid:", user_huid)
+
+    waiting = waiting_for_pin.get(chat_id)
+
+    if not waiting:
+        return
+
+    if waiting["user_huid"] != user_huid:
         print("ERROR WITH user_huid")
         return
 
+    reply_chat_id = UUID(waiting["reply_chat_id"])
+
     waiting_for_pin.pop(chat_id, None)
 
-    print("DATA FOR PIN:", message.bot.id, UUID(chat_id), message.sync_id)
+    print(
+        "DATA FOR PIN:",
+        message.bot.id,
+        UUID(chat_id),
+        message.sync_id,
+    )
+
     await bot.pin_message(
         bot_id=message.bot.id,
         chat_id=UUID(chat_id),
         sync_id=message.sync_id,
     )
 
-    await bot.answer_message(
-        "📌 Сообщение закреплено!"
+    await bot.send_message(
+        bot_id=message.bot.id,
+        chat_id=reply_chat_id,
+        body="📌 Сообщение закреплено!",
     )
 
 
@@ -89,6 +114,7 @@ print(
     "REGISTERED COMMANDS:",
     collector._user_commands_handlers.keys(),
 )
+
 
 bot = Bot(
     collectors=[collector],
