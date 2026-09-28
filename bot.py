@@ -63,8 +63,11 @@ async def message_handler(
 ) -> None:
     chat_id = os.environ["CHAT_ID"]
     user_huid = str(message.sender.huid)
+    print("MESSAGE - chat_id: ", chat_id)
+    print("MESSAGE - user_huid: ", user_huid)
 
     if waiting_for_pin.get(chat_id) != user_huid:
+        print("ERROR WITH user_huid")
         return
 
     waiting_for_pin.pop(chat_id, None)
