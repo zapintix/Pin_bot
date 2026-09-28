@@ -1,5 +1,6 @@
 import os
 
+from uuid import UUID
 from dotenv import load_dotenv
 from pybotx import (
     Bot,
@@ -74,7 +75,7 @@ async def message_handler(
 
     await bot.pin_message(
         bot_id=message.bot.id,
-        chat_id=os.environ["CHAT_ID"],
+        chat_id=UUID(chat_id),
         sync_id=message.sync_id,
     )
 
